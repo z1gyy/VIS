@@ -1,0 +1,36 @@
+Tabulka: Autor
+id_autora	jmeno	prijmeni	
+
+Tabulka: Kniha_Autor
+Autor_id_autora	Kniha_ISBN	
+
+Tabulka: Zanr
+id_zanru	nazev	
+
+Tabulka: Kniha_Zanr
+Zanr_id_zanru	Kniha_ISBN	
+
+Tabulka: Exemplar
+id_exemplare	Kniha_ISNB	
+1	1234567890	
+2	112233445	
+
+Tabulka: Vypujcka
+id_vypujcka	datum_pujceni	datum_vraceni	datum_skutecneho_vraceni	Ctenar_id_ctenar	Exemplar_id_exemplare	
+1	2024-11-30 18:26:14.4310383	2024-12-14 18:26:14.4310856		2	1	
+2	2024-11-30 18:58:37.8244954	2024-12-14 18:58:37.8361318		1	2	
+3	1232-11-11	1111-11-11		1	1	
+
+Tabulka: Ctenar
+id_ctenar	jmeno	prijmeni	vek	telefon	Email	je_student	mesto	ulice	cp	PSC	Poznamka	
+1	Pepa	Novák	30	420123456789	pepa@seznam.cz	0	Praha	Karlova	12	11000	Testovací záznam	
+2	Jan	Novak	22	111111111	pepik@googe.com	1	Ostrava	Tranovskeho	222	22211	ztutzutzu	
+3	jakub	novak	21	111111111	zingor@google.com	1	Frydek	novakova	123	11111	123123	
+
+Tabulka: Kniha
+ISBN	nazev	pocet_stran	nakladatel	datum_vydani	je_bestseller	Poznamka	
+1232	123	123	123	1011-12-12	1	123	
+112233445	Algoritmy v C#	450	Nakladatelství DEF	2022-10-10 00:00:00	Ano	Komplexní kniha o algoritmech v jazyce C#.	
+123456789	Kniha o programování	200	Nakladatelství ABC	2020-05-01 00:00:00	Ano	Skvělá kniha pro začátečníky.	
+987654321	Pokročilé programování	350	Nakladatelství XYZ	2021-08-15 00:00:00	Ne	Kniha pro pokročilé uživatele.	
+

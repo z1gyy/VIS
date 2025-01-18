@@ -39,7 +39,7 @@ namespace ConsoleApp1
         public override bool Delete()
         {
             using (var connection = GetConnection())
-            {
+            {   
                 var command = new SQLiteCommand("DELETE FROM kniha_autor WHERE autor_id_autora = @AutorId AND kniha_isbn = @KnihaIsbn", connection);
                 command.Parameters.AddWithValue("@AutorId", Autor_id_autora);
                 command.Parameters.AddWithValue("@KnihaIsbn", Kniha_isbn);

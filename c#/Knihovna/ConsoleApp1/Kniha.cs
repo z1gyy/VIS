@@ -11,11 +11,64 @@ namespace ConsoleApp1
     {
         public int Isbn { get; set; }
         public string Nazev { get; set; }
-        public string Pocet_stran { get; set; }
+        public int Pocet_stran { get; set; }
         public string Nakladatel { get; set; }
-        public DateTime Datum_vydani { get; set; }
+        public string Datum_vydani { get; set; }
         public string Je_bestseller { get; set; }
         public string Poznamka { get; set; }
+
+        public Kniha() { }
+
+        public Kniha(int isbn, string nazev, int pocetStran, string nakladatel, string datumVydani, string jeBestseller, string poznamka)
+        {
+            Isbn = isbn;
+            Nazev = nazev;
+            Pocet_stran = pocetStran;
+            Nakladatel = nakladatel;
+            Datum_vydani = datumVydani;
+            Je_bestseller = jeBestseller;
+            Poznamka = poznamka;
+        }
+
+        public static List<Kniha> GetAll()
+        {
+            List<Kniha> knihy = new List<Kniha>();
+
+            try
+            {
+                using (var connection = ActiveRecord.GetConnection())
+                {
+                    connection.Open();
+
+                    using (var command = new SQLiteCommand("SELECT * FROM Kniha", connection))
+                    {
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                knihy.Add(new Kniha
+                                {
+                                    Isbn = Convert.ToInt32(reader["Isbn"]),
+                                    Nazev = reader["Nazev"].ToString(),
+                                    Pocet_stran = Convert.ToInt32(reader["Pocet_stran"]),
+                                    Nakladatel = reader["Nakladatel"].ToString(),
+                                    Datum_vydani = reader["Datum_vydani"].ToString(),
+                                    Je_bestseller = reader["Je_bestseller"].ToString(),
+                                    Poznamka = reader["Poznamka"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chyba při načítání dat: {ex.Message}");
+            }
+
+            return knihy;
+        }
+
 
         public override bool Save()
         {

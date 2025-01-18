@@ -22,6 +22,25 @@ namespace ConsoleApp1
         public string Psc { get; set; }
         public string Poznamka { get; set; }
 
+        public Ctenar() { }
+
+        public Ctenar(int idCtenar, string jmeno, string prijmeni, string vek, string telefon, string email,
+              string jeStudent, string mesto, string ulice, string cp, string psc, string poznamka)
+        {
+            Id_ctenar = idCtenar;
+            Jmeno = jmeno;
+            Prijmeni = prijmeni;
+            Vek = vek;
+            Telefon = telefon;
+            Email = email;
+            Je_student = jeStudent;
+            Mesto = mesto;
+            Ulice = ulice;
+            Cp = cp;
+            Psc = psc;
+            Poznamka = poznamka;
+        }
+
         public override bool Save()
         {
             using (var connection = GetConnection())
@@ -73,6 +92,71 @@ namespace ConsoleApp1
                 command.Parameters.AddWithValue("@Id", Id_ctenar);
                 connection.Open();
                 return command.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public static List<Ctenar> GetAll()
+        {
+            List<Ctenar> ctenari = new List<Ctenar>();
+
+            try
+            {
+                using (var connection = ActiveRecord.GetConnection())
+                {
+                    connection.Open();
+
+                    using (var command = new SQLiteCommand("SELECT * FROM Ctenar", connection))
+                    {
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ctenari.Add(new Ctenar
+                                {
+                                    Id_ctenar = Convert.ToInt32(reader["Id_ctenar"]),
+                                    Jmeno = reader["Jmeno"].ToString(),
+                                    Prijmeni = reader["Prijmeni"].ToString(),
+                                    Vek = reader["Vek"].ToString(),
+                                    Telefon = reader["Telefon"].ToString(),
+                                    Email = reader["Email"].ToString(),
+                                    Je_student = reader["Je_student"].ToString(),
+                                    Mesto = reader["Mesto"].ToString(),
+                                    Ulice = reader["Ulice"].ToString(),
+                                    Cp = reader["Cp"].ToString(),
+                                    Psc = reader["Psc"].ToString(),
+                                    Poznamka = reader["Poznamka"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chyba při načítání dat: {ex.Message}");
+            }
+
+            return ctenari;
+        }
+
+
+        public int LoadReaderIdByEmail(string email)
+        {
+            using (var connection = GetConnection())
+            {
+                var command = new SQLiteCommand("SELECT Id_ctenar FROM Ctenar WHERE Email = @Email", connection);
+                command.Parameters.AddWithValue("@Email", email);
+                connection.Open();
+                var reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    return reader.GetInt32(0);
+                }
+                else
+                {
+                    return -1; 
+                }
             }
         }
     }
