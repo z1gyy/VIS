@@ -61,33 +61,18 @@ namespace WinFormsApp1
 
             try
             {
-                // Použití ActiveRecord pro získání připojení
-                using (var connection = ActiveRecord.GetConnection())
+                // Vytvoření nového objektu Kniha
+                var kniha = new Kniha(int.Parse(isbn), nazev, pocetStran, nakladatel, datumVydani.ToString("yyyy-MM-dd"), jeBestseller == 1 ? "1" : "0", poznamka);
+
+                // Zavolání metody Save pro uložení knihy do databáze
+                if (kniha.Save())
                 {
-                    connection.Open();
-
-                    // SQL příkaz pro vytvoření nového záznamu v tabulce Kniha
-                    string query = @"
-                INSERT INTO Kniha (ISBN, Nazev, Pocet_Stran, Nakladatel, Datum_Vydani, Je_Bestseller, Poznamka)
-                VALUES (@ISBN, @Nazev, @PocetStran, @Nakladatel, @DatumVydani, @JeBestseller, @Poznamka)";
-
-                    using (var command = new SQLiteCommand(query, connection))
-                    {
-                        // Přiřazení parametrů
-                        command.Parameters.AddWithValue("@ISBN", isbn);
-                        command.Parameters.AddWithValue("@Nazev", nazev);
-                        command.Parameters.AddWithValue("@PocetStran", pocetStran);
-                        command.Parameters.AddWithValue("@Nakladatel", nakladatel);
-                        command.Parameters.AddWithValue("@DatumVydani", datumVydani.ToString("yyyy-MM-dd")); // Formátování na SQL datum
-                        command.Parameters.AddWithValue("@JeBestseller", jeBestseller);
-                        command.Parameters.AddWithValue("@Poznamka", poznamka);
-
-                        // Provedení příkazu
-                        command.ExecuteNonQuery();
-                    }
+                    MessageBox.Show("Kniha byla úspěšně přidána do databáze.");
                 }
-
-                MessageBox.Show("Kniha byla úspěšně přidána do databáze.");
+                else
+                {
+                    MessageBox.Show("Chyba při přidávání knihy.");
+                }
             }
             catch (Exception ex)
             {

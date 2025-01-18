@@ -31,28 +31,21 @@ namespace WinFormsApp1
         {
             if (load1)
             {
-                string id_kniha = textBox1.Text; // ID tabulky k dropnutí
+                string id_knihaText = textBox1.Text; // ID tabulky k dropnutí
 
-                if (!string.IsNullOrWhiteSpace(id_kniha))
+                if (!string.IsNullOrWhiteSpace(id_knihaText) && int.TryParse(id_knihaText, out int id_kniha))
                 {
                     try
                     {
-                        using (var connection = ActiveRecord.GetConnection())
+                        Kniha kniha = new Kniha { Isbn = id_kniha };
+
+                        if (kniha.Delete())
                         {
-                            connection.Open();
-
-                            // SQL příkaz pro DROP TABLE
-                            string query = @"DELETE FROM Kniha WHERE ISBN = @id_kniha";
-
-                            using (var command = new SQLiteCommand(query, connection))
-                            {
-                                command.Parameters.AddWithValue("@id_kniha", id_kniha);
-
-                                // Provedení příkazu
-                                command.ExecuteNonQuery();
-                            }
-
-                            MessageBox.Show($"úspěšně odstraněnos.");
+                            MessageBox.Show("Kniha byla úspěšně odstraněna.");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Kniha se nepodařilo odstranit.");
                         }
                     }
                     catch (Exception ex)
@@ -67,30 +60,21 @@ namespace WinFormsApp1
             }
             else if (load2)
             {
-                //vypujcka
-                // Vypůjčka
-                string id_vypujcka = textBox1.Text; // ID tabulky k dropnutí
+                string id_vypujckaText = textBox1.Text; // ID tabulky k dropnutí
 
-                if (!string.IsNullOrWhiteSpace(id_vypujcka))
+                if (!string.IsNullOrWhiteSpace(id_vypujckaText) && int.TryParse(id_vypujckaText, out int id_vypujcka))
                 {
                     try
                     {
-                        using (var connection = ActiveRecord.GetConnection())
+                        Vypujcka vypujcka = new Vypujcka { Id_vypujcka = id_vypujcka };
+
+                        if (vypujcka.Delete())
                         {
-                            connection.Open();
-
-                            // SQL příkaz pro DROP TABLE
-                            string query = @"DELETE FROM Vypujcka WHERE id_vypujcka = @id_vypujcka";
-
-                            using (var command = new SQLiteCommand(query, connection))
-                            {
-                                command.Parameters.AddWithValue("@id_vypujcka", id_vypujcka);
-
-                                // Provedení příkazu
-                                command.ExecuteNonQuery();
-                            }
-
-                            MessageBox.Show($"úspěšně odstraněnos.");
+                            MessageBox.Show("Vypujcka byla úspěšně odstraněna.");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Vypujcku se nepodařilo odstranit.");
                         }
                     }
                     catch (Exception ex)
@@ -106,30 +90,24 @@ namespace WinFormsApp1
             else if (load3)
             {
                 // Čtenáři
-                string id_ctenar = textBox1.Text; // ID tabulky k dropnutí
+                string id_ctenarText = textBox1.Text; // ID tabulky k dropnutí
 
-                if (!string.IsNullOrWhiteSpace(id_ctenar))
+                if (!string.IsNullOrWhiteSpace(id_ctenarText) && int.TryParse(id_ctenarText, out int id_ctenar))
                 {
                     try
                     {
-                        using (var connection = ActiveRecord.GetConnection())
+                        Ctenar ctenar = new Ctenar { Id_ctenar = id_ctenar };
+
+                        if (ctenar.Delete())
                         {
-                            connection.Open();
-
-                            // SQL příkaz pro DROP TABLE
-                            string query = @"DELETE FROM Ctenari WHERE id_ctenar = @id_ctenar";
-
-                            using (var command = new SQLiteCommand(query, connection))
-                            {
-                                command.Parameters.AddWithValue("@id_ctenar", id_ctenar);
-
-                                // Provedení příkazu
-                                command.ExecuteNonQuery();
-                            }
-
-                            MessageBox.Show($"úspěšně odstraněno.");
+                            MessageBox.Show("Ctenar byl úspěšně odstraněna");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Ctenare se nepodařilo odstranit.");
                         }
                     }
+                    
                     catch (Exception ex)
                     {
                         MessageBox.Show("Chyba při mazání tabulky Ctenari: " + ex.Message);

@@ -21,6 +21,7 @@ namespace WinFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
+            // Získání hodnot z textových polí
             string isbn = textBox1.Text;              // ISBN
             string nazev = textBox2.Text;             // Název
             string pocetStranText = textBox3.Text;    // Počet stran (jako text, konvertujeme na číslo)
@@ -56,52 +57,22 @@ namespace WinFormsApp1
 
             try
             {
-                // Použití ActiveRecord pro získání připojení
-                using (var connection = ActiveRecord.GetConnection())
+                // Vytvoření nového objektu Kniha
+                var kniha = new Kniha(int.Parse(isbn), nazev, pocetStran, nakladatel, datumVydani.ToString("yyyy-MM-dd"), jeBestseller == 1 ? "1" : "0", poznamka);
+
+                if (kniha.Update())
                 {
-                    connection.Open();
-
-                    // SQL příkaz pro aktualizaci záznamu v tabulce Kniha
-                    string query = @"
-            UPDATE Kniha
-            SET 
-                Nazev = @Nazev,
-                Pocet_Stran = @PocetStran,
-                Nakladatel = @Nakladatel,
-                Datum_Vydani = @DatumVydani,
-                Je_Bestseller = @JeBestseller,
-                Poznamka = @Poznamka
-            WHERE ISBN = @ISBN";
-
-                    using (var command = new SQLiteCommand(query, connection))
-                    {
-                        // Přiřazení parametrů
-                        command.Parameters.AddWithValue("@ISBN", isbn);
-                        command.Parameters.AddWithValue("@Nazev", nazev);
-                        command.Parameters.AddWithValue("@PocetStran", pocetStran);
-                        command.Parameters.AddWithValue("@Nakladatel", nakladatel);
-                        command.Parameters.AddWithValue("@DatumVydani", datumVydani.ToString("yyyy-MM-dd")); // Formátování na SQL datum
-                        command.Parameters.AddWithValue("@JeBestseller", jeBestseller);
-                        command.Parameters.AddWithValue("@Poznamka", poznamka);
-
-                        // Provedení příkazu
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show($"Kniha s ISBN {isbn} byla úspěšně aktualizována.");
-                        }
-                        else
-                        {
-                            MessageBox.Show($"Kniha s ISBN {isbn} nebyla nalezena.");
-                        }
-                    }
+                    MessageBox.Show("Kniha byla úspěšně aktualizována.");
+                }
+                else
+                {
+                    MessageBox.Show("Chyba při aktualizování knihy.");
                 }
             }
             catch (Exception ex)
             {
                 // Ošetření chyb
-                MessageBox.Show("Chyba při aktualizaci knihy v databázi: " + ex.Message);
+                MessageBox.Show("Chyba při aktualizování knihy v databáze: " + ex.Message);
             }
 
         }

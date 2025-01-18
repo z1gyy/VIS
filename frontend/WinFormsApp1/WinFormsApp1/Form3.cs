@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using System.Data.SQLite;
+using ConsoleApp1;
 
 namespace WinFormsApp1
 {
@@ -180,35 +181,22 @@ namespace WinFormsApp1
         {
             try
             {
-                using (var connection = new SQLiteConnection("Data Source=C:\\Users\\Žigy-san\\Desktop\\vis\\dbs\\dbs.db;Version=3;")) // SQLite připojení
+                Ctenar ctenar = new Ctenar();
+                int idCtenar = ctenar.LoadReaderIdByEmail(email); 
+
+                if (idCtenar != -1) 
                 {
-                    connection.Open();
-                    // SQL dotaz na vyhledání knih podle e-mailu čtenáře
-                    var command = new SQLiteCommand("SELECT Id_ctenar, Email FROM Ctenar WHERE Email = @Email", connection);
-                    command.Parameters.AddWithValue("@Email", email);
-
-                    var reader = command.ExecuteReader();
-                    var dataTable = new DataTable();
-                    dataTable.Load(reader);
-                    if (dataTable.Rows.Count > 0)
-                    {
-                        int id_ctenar = Convert.ToInt32(dataTable.Rows[0]["id_ctenar"]);
-                        Form4 form4 = new Form4(id_ctenar);
-                        form4.Show();
-                        //MessageBox.Show("Ok " + dataTable.Rows.Count);
-
-                    }
-                    else
-                    {
-                        MessageBox.Show("Účet není aktivován zajděte prosím do svojí knihovny pro více informací.");
-                    }
+                    Form4 form4 = new Form4(idCtenar);
+                    form4.Show();
                 }
-
+                else
+                {
+                    MessageBox.Show("Účet není aktivován, zajděte prosím do své knihovny pro více informací.");
+                }
             }
-            
             catch (Exception ex)
             {
-                MessageBox.Show("Účet není aktivován zajděte prosím do svojí knihovny pro více informací." );
+                MessageBox.Show("Chyba při načítání dat: " + ex.Message);
             }
         }
     }

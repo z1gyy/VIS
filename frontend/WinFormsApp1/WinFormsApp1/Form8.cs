@@ -61,33 +61,23 @@ namespace WinFormsApp1
 
             try
             {
-                // Použití ActiveRecord pro získání připojení
-                using (var connection = ActiveRecord.GetConnection())
+                Vypujcka vypujcka = new Vypujcka
                 {
-                    connection.Open();
+                    Id_vypujcka = id_vypujcka,
+                    Datum_pujceni = datum_pujceni.ToString("yyyy-MM-dd"),
+                    Datum_vraceni = datum_vraceni.ToString("yyyy-MM-dd"),
+                    Ctenar_id_ctenar = Ctenar_id_ctenar,
+                    Exemplar_id_exemplare = Exemplar_id_exemplar
+                };
 
-                    // SQL příkaz pro vytvoření nového záznamu v tabulce Vypujcka
-                    string query = @"
-        INSERT INTO Vypujcka 
-        (id_vypujcka, datum_pujceni, datum_vraceni, Ctenar_id_ctenar, Exemplar_id_exemplare)
-        VALUES 
-        (@id_vypujcka, @datum_pujceni, @datum_vraceni, @Ctenar_id_ctenar, @Exemplar_id_exemplare)";
-
-                    using (var command = new SQLiteCommand(query, connection))
-                    {
-                        // Přiřazení parametrů
-                        command.Parameters.AddWithValue("@id_vypujcka", id_vypujcka);
-                        command.Parameters.AddWithValue("@datum_pujceni", datum_pujceni.ToString("yyyy-MM-dd")); // Formátování na SQL datum
-                        command.Parameters.AddWithValue("@datum_vraceni", datum_vraceni.ToString("yyyy-MM-dd")); // Formátování na SQL datum
-                        command.Parameters.AddWithValue("@Ctenar_id_ctenar", Ctenar_id_ctenar);
-                        command.Parameters.AddWithValue("@Exemplar_id_exemplare", Exemplar_id_exemplar);
-
-                        // Provedení příkazu
-                        command.ExecuteNonQuery();
-                    }
+                if (vypujcka.Save())
+                {
+                    MessageBox.Show("Výpůjčka byla úspěšně přidána do databáze.");
                 }
-
-                MessageBox.Show("Výpůjčka byla úspěšně přidána do databáze.");
+                else
+                {
+                    MessageBox.Show("Chyba při přidávání výpůjčky do databáze.");
+                }
             }
             catch (Exception ex)
             {

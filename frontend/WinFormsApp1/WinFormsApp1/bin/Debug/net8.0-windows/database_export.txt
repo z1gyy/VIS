@@ -23,7 +23,7 @@ id_vypujcka	datum_pujceni	datum_vraceni	datum_skutecneho_vraceni	Ctenar_id_ctena
 
 Tabulka: Kniha
 ISBN	nazev	pocet_stran	nakladatel	datum_vydani	je_bestseller	Poznamka	
-123	Neco	123	Lojzkova	2024-12-01	1	asdasd	
+1232	123	123	123	1011-12-12	1	123	
 112233445	Algoritmy v C#	450	Nakladatelství DEF	2022-10-10 00:00:00	0	Komplexní kniha o algoritmech v jazyce C#.	
 123456789	Kniha o programování	200	Nakladatelství ABC	2020-05-01 00:00:00	0	Skvělá kniha pro začátečníky.	
 987654321	Pokročilé programování	350	Nakladatelství XYZ	2021-08-15 00:00:00	0	Kniha pro pokročilé uživatele.	
@@ -32,4 +32,5 @@ Tabulka: Ctenar
 id_ctenar	jmeno	prijmeni	vek	telefon	Email	je_student	mesto	ulice	cp	PSC	Poznamka	
 1	Pepa	Novák	30	420123456789	pepa@seznam.cz	0	Praha	Karlova	12	11000	Testovací záznam	
 2	Jan	Novak	22	111111111	pepik@googe.com	1	Ostrava	Tranovskeho	222	22211	ztutzutzu	
+3	jakub	novak	21	111111111	zingor@google.com	1	Frydek	novakova	123	11111	123123	
 

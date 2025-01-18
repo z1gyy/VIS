@@ -38,15 +38,24 @@ namespace WinFormsApp1
 
         private void LoadData()
         {
-            using (var connection = ActiveRecord.GetConnection())
+            var knihy = Kniha.GetAll();
+            /*
+            if (knihy == null || !knihy.Any())
             {
-                var command = new SQLiteCommand("SELECT Isbn, Nazev, Pocet_Stran, Nakladatel, Datum_vydani, Je_bestseller, Poznamka FROM Kniha", connection);
-                connection.Open();
-                var book = command.ExecuteReader();
-                var dataTable = new System.Data.DataTable();
-                dataTable.Load(book);
-                dataGridView1.DataSource = dataTable;
+                MessageBox.Show("Žádná data nebyla načtena!");
+                return;
             }
+            */
+            dataGridView1.DataSource = knihy.Select(k => new
+            {
+                k.Isbn,
+                k.Nazev,
+                k.Pocet_stran,
+                k.Nakladatel,
+                k.Datum_vydani,
+                k.Je_bestseller,
+                k.Poznamka
+            }).ToList();
             HideUnwantedColumns();
             load_1 = true;
             load_2 = false;
@@ -54,30 +63,20 @@ namespace WinFormsApp1
 
         private void LoadBorrowings()
         {
-            using (var connection = ActiveRecord.GetConnection())
-            {
-                // SQL dotaz pro načtení výpůjček s parametrizací
-                var command = new SQLiteCommand("SELECT k.nazev, v.datum_pujceni, v.datum_vraceni " +
-                                                "FROM Vypujcka v " +
-                                                "JOIN Exemplar e ON v.Exemplar_id_exemplare = e.id_exemplare " +
-                                                "JOIN Kniha k ON e.Kniha_ISNB = k.ISBN " +
-                                                "WHERE v.Ctenar_id_ctenar = @IdCtenare;", connection);
+                // Načtení výpůjček pomocí metody VypujckaById
+                var vypujcky = new Vypujcka().VypujckaById(id_ctenare);
 
-                // Přidání parametru
-                command.Parameters.AddWithValue("@IdCtenare", id_ctenare);
+                // Přímo přiřazení výpůjček k DataGridView pomocí LINQ
+                dataGridView1.DataSource = vypujcky.Select(v => new
+                {
+                    v.Id_vypujcka,
+                    v.Datum_pujceni,
+                    v.Datum_vraceni
+                }).ToList();
 
-                connection.Open();
-                var borrowings = command.ExecuteReader();
 
-                // Načtení dat do DataTable a přiřazení k DataGridView
-                var dataTable = new System.Data.DataTable();
-                dataTable.Load(borrowings);
-                dataGridView1.DataSource = dataTable;
-            }
-
-            HideUnwantedColumnsForBorrowings();
-            load_2 = true;
-            load_1 = false;
+                load_2 = true;
+                load_1 = false;
         }
 
         private void HideUnwantedColumns()
@@ -346,16 +345,12 @@ namespace WinFormsApp1
     }
 
 
-        private void HideUnwantedColumnsForBorrowings()
-        {
-            if (dataGridView1.Columns["Id"] != null)
-                dataGridView1.Columns["Id"].Visible = false; // Skryje ID, pokud není potřeba
-        }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
         }
+
 
         private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
         {
@@ -364,22 +359,18 @@ namespace WinFormsApp1
                 if (dataGridView1.SelectedRows.Count > 0)
                 {
                     var selectedRow = dataGridView1.SelectedRows[0];
+                    var selectedBook = selectedRow.DataBoundItem as dynamic;
 
-                    string isbn = selectedRow.Cells["Isbn"].Value.ToString();
-                    string nazev = selectedRow.Cells["Nazev"].Value.ToString();
-                    string pocetStran = selectedRow.Cells["Pocet_Stran"].Value.ToString();
-                    string nakladatel = selectedRow.Cells["Nakladatel"].Value.ToString();
-                    string datum_vydani = selectedRow.Cells["Datum_vydani"].Value.ToString();
-                    string je_bestseller = selectedRow.Cells["Je_bestseller"].Value.ToString();
-                    string poznamka = selectedRow.Cells["Poznamka"].Value.ToString();
-
-                    textBox1.Text = isbn;
-                    textBox2.Text = nazev;
-                    textBox3.Text = pocetStran;
-                    textBox4.Text = nakladatel;
-                    textBox5.Text = datum_vydani;
-                    textBox6.Text = je_bestseller;
-                    textBox7.Text = poznamka;
+                    if (selectedBook != null)
+                    {
+                        textBox1.Text = selectedBook.Isbn.ToString();
+                        textBox2.Text = selectedBook.Nazev;
+                        textBox3.Text = selectedBook.Pocet_stran.ToString();
+                        textBox4.Text = selectedBook.Nakladatel;
+                        textBox5.Text = selectedBook.Datum_vydani;
+                        textBox6.Text = selectedBook.Je_bestseller;
+                        textBox7.Text = selectedBook.Poznamka;
+                    }
                 }
             }
         }

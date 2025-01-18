@@ -22,12 +22,12 @@ namespace WinFormsApp1
         private void button1_Click(object sender, EventArgs e)
         {
             // Získání hodnot z textových polí
-            string id_vypujckaText = textBox1.Text;             // id_vypujcka (jako text, konvertujeme na číslo)
-            string datum_pujceniText = textBox2.Text;           // datum_pujceni (jako text, konvertujeme na datum)
-            string datum_vraceniText = textBox3.Text;           // datum_vraceni (jako text, konvertujeme na datum)
-            string datum_skutecneho_vraceniText = textBox4.Text; // datum_skutecneho_vraceni (jako text, konvertujeme na datum)
-            string Ctenar_id_ctenarText = textBox5.Text;        // Ctenar_id_ctenar (jako text, konvertujeme na číslo)
-            string Exemplar_id_exemplarText = textBox6.Text;    // Exemplar_id_exemplar (jako text, konvertujeme na číslo)
+            string id_vypujckaText = textBox1.Text;         // id_vypujcka (jako text, konvertujeme na číslo)
+            string datum_pujceniText = textBox2.Text;       // datum_pujceni (jako text, konvertujeme na datum)
+            string datum_vraceniText = textBox3.Text;       // datum_vraceni (jako text, konvertujeme na datum)
+            string datum_skutecne_vraceniText = textBox4.Text;       // datum_vraceni (jako text, konvertujeme na datum)
+            string Ctenar_id_ctenarText = textBox5.Text;    // Ctenar_id_ctenar (jako text, konvertujeme na číslo)
+            string Exemplar_id_exemplarText = textBox6.Text; // Exemplar_id_exemplar (jako text, konvertujeme na číslo)
 
             // Validace vstupů
             if (!int.TryParse(id_vypujckaText, out int id_vypujcka))
@@ -48,16 +48,10 @@ namespace WinFormsApp1
                 return;
             }
 
-            // datum_skutecneho_vraceni není povinné
-            DateTime? datum_skutecneho_vraceni = null;
-            if (!string.IsNullOrWhiteSpace(datum_skutecneho_vraceniText))
+            if (!DateTime.TryParse(datum_skutecne_vraceniText, out DateTime datum_skutecne_vraceni))
             {
-                if (!DateTime.TryParse(datum_skutecneho_vraceniText, out DateTime parsedDatumSkutecnehoVraceni))
-                {
-                    MessageBox.Show("datum_skutecneho_vraceni musí být ve správném formátu (např. YYYY-MM-DD).");
-                    return;
-                }
-                datum_skutecneho_vraceni = parsedDatumSkutecnehoVraceni;
+                MessageBox.Show("datum_skutecne_vraceni musí být ve správném formátu (např. YYYY-MM-DD).");
+                return;
             }
 
             if (!int.TryParse(Ctenar_id_ctenarText, out int Ctenar_id_ctenar))
@@ -74,62 +68,30 @@ namespace WinFormsApp1
 
             try
             {
-                // Použití ActiveRecord pro získání připojení
-                using (var connection = ActiveRecord.GetConnection())
+                Vypujcka vypujcka = new Vypujcka
                 {
-                    connection.Open();
+                    Id_vypujcka = id_vypujcka,
+                    Datum_pujceni = datum_pujceni.ToString("yyyy-MM-dd"),
+                    Datum_vraceni = datum_vraceni.ToString("yyyy-MM-dd"),
+                    Datum_skutecneho_vraceni = datum_skutecne_vraceni.ToString("yyyy-MM-dd"),
+                    Ctenar_id_ctenar = Ctenar_id_ctenar,
+                    Exemplar_id_exemplare = Exemplar_id_exemplar
+                };
 
-                    // SQL příkaz pro aktualizaci záznamu v tabulce Vypujcka
-                    string query = @"
-                    UPDATE Vypujcka
-                    SET 
-                        datum_pujceni = @datum_pujceni,
-                        datum_vraceni = @datum_vraceni,
-                        datum_skutecneho_vraceni = @datum_skutecneho_vraceni,
-                        Ctenar_id_ctenar = @Ctenar_id_ctenar,
-                        Exemplar_id_exemplare = @Exemplar_id_exemplare
-                    WHERE id_vypujcka = @id_vypujcka";
-
-                    using (var command = new SQLiteCommand(query, connection))
-                    {
-                        // Přiřazení parametrů
-                        command.Parameters.AddWithValue("@id_vypujcka", id_vypujcka);
-                        command.Parameters.AddWithValue("@datum_pujceni", datum_pujceni.ToString("yyyy-MM-dd")); // Formátování na SQL datum
-                        command.Parameters.AddWithValue("@datum_vraceni", datum_vraceni.ToString("yyyy-MM-dd")); // Formátování na SQL datum
-
-                        // Nastavení skutečného data vrácení, pokud je vyplněno
-                        if (datum_skutecneho_vraceni.HasValue)
-                        {
-                            command.Parameters.AddWithValue("@datum_skutecneho_vraceni", datum_skutecneho_vraceni.Value.ToString("yyyy-MM-dd"));
-                        }
-                        else
-                        {
-                            command.Parameters.AddWithValue("@datum_skutecneho_vraceni", DBNull.Value);
-                        }
-
-                        command.Parameters.AddWithValue("@Ctenar_id_ctenar", Ctenar_id_ctenar);
-                        command.Parameters.AddWithValue("@Exemplar_id_exemplare", Exemplar_id_exemplar);
-
-                        // Provedení příkazu
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show($"Záznam s ID {id_vypujcka} byl úspěšně aktualizován.");
-                        }
-                        else
-                        {
-                            MessageBox.Show($"Záznam s ID {id_vypujcka} nebyl nalezen.");
-                        }
-                    }
+                if (vypujcka.Update())
+                {
+                    MessageBox.Show("Výpůjčka byla úspěšně aktualizována v databázi.");
+                }
+                else
+                {
+                    MessageBox.Show("Chyba při aktualizování výpůjčky v databázi.");
                 }
             }
             catch (Exception ex)
             {
                 // Ošetření chyb
-                MessageBox.Show("Chyba při aktualizaci výpůjčky v databázi: " + ex.Message);
+                MessageBox.Show("Chyba při aktualizování výpůjčky v databáze: " + ex.Message);
             }
-
         }
     }
 }

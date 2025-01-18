@@ -46,15 +46,24 @@ namespace WinFormsApp1
 
         private void LoadData()
         {
-            using (var connection = ActiveRecord.GetConnection())
+            var knihy = Kniha.GetAll();
+            /*
+            if (knihy == null || !knihy.Any())
             {
-                var command = new SQLiteCommand("SELECT Isbn, Nazev, Pocet_Stran, Nakladatel, Datum_vydani, Je_bestseller, Poznamka FROM Kniha", connection);
-                connection.Open();
-                var book = command.ExecuteReader();
-                var dataTable = new System.Data.DataTable();
-                dataTable.Load(book);
-                dataGridView1.DataSource = dataTable;
+                MessageBox.Show("Žádná data nebyla načtena!");
+                return;
             }
+            */
+            dataGridView1.DataSource = knihy.Select(k => new
+            {
+                k.Isbn,
+                k.Nazev,
+                k.Pocet_stran,
+                k.Nakladatel,
+                k.Datum_vydani,
+                k.Je_bestseller,
+                k.Poznamka
+            }).ToList();
             HideUnwantedColumns();
             load_1 = true;
             load_2 = false;
@@ -63,46 +72,67 @@ namespace WinFormsApp1
 
         private void LoadBorrowings()
         {
-            using (var connection = ActiveRecord.GetConnection())
+            // Načtení výpůjček
+            var borrowings = Vypujcka.GetAll();
+
+            /*
+            // Pokud výpůjčky neexistují
+            if (borrowings == null || !borrowings.Any())
             {
-                // SQL dotaz pro načtení výpůjček s parametrizací
-                var command = new SQLiteCommand("select * from Vypujcka;", connection);
-
-                connection.Open();
-                var borrowings = command.ExecuteReader();
-
-                // Načtení dat do DataTable a přiřazení k DataGridView
-                var dataTable = new System.Data.DataTable();
-                dataTable.Load(borrowings);
-                dataGridView1.DataSource = dataTable;
+                MessageBox.Show("Žádná výpůjčka nebyla načtena!");
+                return;
             }
+            */
+            dataGridView1.DataSource = borrowings.Select(b => new
+            {
+                b.Id_vypujcka,
+                b.Datum_pujceni,
+                b.Datum_vraceni,
+                b.Datum_skutecneho_vraceni,
+                b.Ctenar_id_ctenar,
+                b.Exemplar_id_exemplare
+            }).ToList();
 
+            // Skrytí nežádoucích sloupců
             HideUnwantedColumnsForBorrowings();
+
             load_2 = true;
             load_1 = false;
             load_3 = false;
         }
+
         private void LoadReaders()
         {
-            using (var connection = ActiveRecord.GetConnection())
+            var readers = Ctenar.GetAll(); 
+
+            /*
+            if (readers == null || !readers.Any())
             {
-                // SQL dotaz pro načtení výpůjček s parametrizací
-                var command = new SQLiteCommand("select * from Ctenar;", connection);
-
-                connection.Open();
-                var readers = command.ExecuteReader();
-
-                // Načtení dat do DataTable a přiřazení k DataGridView
-                var dataTable = new System.Data.DataTable();
-                dataTable.Load(readers);
-                dataGridView1.DataSource = dataTable;
+                MessageBox.Show("Žádní čtenáři nebyli nalezeni!");
+                return;
             }
+            */
+            dataGridView1.DataSource = readers.Select(r => new
+            {
+                r.Id_ctenar,
+                r.Jmeno,
+                r.Prijmeni,
+                r.Vek,
+                r.Telefon,
+                r.Email,
+                r.Je_student,
+                r.Mesto,
+                r.Ulice,
+                r.Cp,
+                r.Psc,
+                r.Poznamka
+            }).ToList();
 
-            HideUnwantedColumnsForBorrowings();
             load_3 = true;
             load_1 = false;
             load_2 = false;
         }
+
 
         private void HideUnwantedColumns()
         {
@@ -485,60 +515,12 @@ namespace WinFormsApp1
             LoadReaders();
         }
 
-        static void ExportDatabaseToText(string dbFile, string exportFile)
-        {
-            using (var connection = new SQLiteConnection($"Data Source={dbFile};"))
-            {
-                connection.Open();
-
-                // Získání seznamu tabulek
-                var command = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table';", connection);
-                using (var reader = command.ExecuteReader())
-                {
-                    // Otevření souboru pro zápis
-                    using (StreamWriter writer = new StreamWriter(exportFile))
-                    {
-                        // Procházení všech tabulek v databázi
-                        while (reader.Read())
-                        {
-                            string tableName = reader.GetString(0);
-                            writer.WriteLine($"Tabulka: {tableName}");
-
-                            // Získání dat z každé tabulky
-                            var dataCommand = new SQLiteCommand($"SELECT * FROM {tableName};", connection);
-                            using (var dataReader = dataCommand.ExecuteReader())
-                            {
-                                // Zapsání názvů sloupců
-                                for (int i = 0; i < dataReader.FieldCount; i++)
-                                {
-                                    writer.Write(dataReader.GetName(i) + "\t");
-                                }
-                                writer.WriteLine();
-
-                                // Zapsání dat
-                                while (dataReader.Read())
-                                {
-                                    for (int i = 0; i < dataReader.FieldCount; i++)
-                                    {
-                                        writer.Write(dataReader.GetValue(i) + "\t");
-                                    }
-                                    writer.WriteLine();
-                                }
-                            }
-                            writer.WriteLine(); // Mezera mezi tabulkami
-                        }
-                    }
-                }
-            }
-        }
         private void button7_Click(object sender, EventArgs e)
         {
-            string dbFile = "C:\\Users\\Žigy-san\\Desktop\\vis\\dbs\\dbs.db";
-            string exportFile = "database_export.txt";   // Cesta k souboru pro export
 
             try
             {
-                ExportDatabaseToText(dbFile, exportFile);
+                ActiveRecord.ExportDatabaseToText();
                 Console.WriteLine("Databáze byla úspěšně exportována do textového souboru.");
             }
             catch (Exception ex)
